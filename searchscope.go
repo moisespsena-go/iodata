@@ -22,14 +22,10 @@ type Field struct {
 	Value reflect.Value
 }
 
-var Dialect, _ = gorm.GetDialect("mysql")
-
-const TABLE_NAME = "TABLE_NAME"
-const ID_FIELD = "ID"
-
 type Scope struct {
 	Header          *api.DataHeader
 	Search          *Search
+	Dialect         gorm.Dialect
 	Value           interface{}
 	SQL             string
 	SQLVars         []interface{}
@@ -42,6 +38,8 @@ type Scope struct {
 	primaryValue    interface{}
 	primaryValueSet bool
 	counter         bool
+	Table           string
+	KeyField        string
 }
 
 // Quote used to quote string to escape them for database
@@ -49,12 +47,12 @@ func (scope *Scope) Quote(str string) string {
 	if strings.Index(str, ".") != -1 {
 		newStrs := []string{}
 		for _, str := range strings.Split(str, ".") {
-			newStrs = append(newStrs, Dialect.Quote(str))
+			newStrs = append(newStrs, scope.Dialect.Quote(str))
 		}
 		return strings.Join(newStrs, ".")
 	}
 
-	return Dialect.Quote(str)
+	return scope.Dialect.Quote(str)
 }
 
 // AddToVars add value as sql's vars, used to prevent SQL injection
@@ -68,7 +66,7 @@ func (scope *Scope) AddToVars(value interface{}) string {
 	}
 
 	scope.SQLVars = append(scope.SQLVars, value)
-	return Dialect.BindVar(len(scope.SQLVars))
+	return scope.Dialect.BindVar(len(scope.SQLVars))
 }
 
 // SelectAttrs return selected attributes
@@ -136,13 +134,13 @@ func (scope *Scope) quoteIfPossible(str string) string {
 }
 
 func (scope *Scope) primaryCondition(value interface{}) string {
-	return fmt.Sprintf("(%v.%v = %v)", TABLE_NAME, scope.Quote(ID_FIELD), value)
+	return fmt.Sprintf("(%v.%v = %v)", scope.Table, scope.Quote(scope.KeyField), value)
 }
 
 func (scope *Scope) buildCondition(clause map[string]interface{}, include bool) (str string, err error) {
 	var (
-		quotedTableName  = TABLE_NAME
-		quotedPrimaryKey = scope.Quote(ID_FIELD)
+		quotedTableName  = scope.Table
+		quotedPrimaryKey = scope.Quote(scope.KeyField)
 		equalSQL         = "="
 		inSQL            = "IN"
 	)
@@ -310,12 +308,12 @@ func (scope *Scope) buildSelectQuery(clause map[string]interface{}) (str string)
 
 func (scope *Scope) whereSQL() (sql string, err error) {
 	var (
-		quotedTableName                                = TABLE_NAME
+		quotedTableName                                = scope.Table
 		primaryConditions, andConditions, orConditions []string
 	)
 
 	if scope.primaryValueSet {
-		sql = fmt.Sprintf("%v.%v = %v", quotedTableName, scope.Quote(ID_FIELD), scope.AddToVars(scope.primaryValue))
+		sql = fmt.Sprintf("%v.%v = %v", quotedTableName, scope.Quote(scope.KeyField), scope.AddToVars(scope.primaryValue))
 		primaryConditions = append(primaryConditions, sql)
 	}
 
@@ -369,7 +367,7 @@ func (scope *Scope) whereSQL() (sql string, err error) {
 func (scope *Scope) selectSQL() (sql string) {
 	if len(scope.Search.selects) == 0 {
 		if len(scope.Search.joinConditions) > 0 {
-			sql = fmt.Sprintf("%v.*", TABLE_NAME)
+			sql = fmt.Sprintf("%v.*", scope.Table)
 		} else {
 			sql = "*"
 		}
@@ -400,7 +398,7 @@ func (scope *Scope) orderSQL() string {
 }
 
 func (scope *Scope) limitAndOffsetSQL() string {
-	return Dialect.LimitAndOffsetSQL(scope.Search.limit, scope.Search.offset)
+	return scope.Dialect.LimitAndOffsetSQL(scope.Search.limit, scope.Search.offset)
 }
 
 func (scope *Scope) groupSQL() string {
@@ -445,7 +443,7 @@ func (scope *Scope) joinsSQL() (sql string, err error) {
 	return strings.Join(joinConditions, " ") + " ", nil
 }
 
-func (scope Scope) prepareQuerySQL() (*Scope, error) {
+func (scope Scope) PrepareQuerySQL() (*Scope, error) {
 	scope.Search = &(*scope.Search)
 	sql, err := scope.CombinedConditionSql()
 	if err != nil {
@@ -454,7 +452,7 @@ func (scope Scope) prepareQuerySQL() (*Scope, error) {
 	if scope.Search.raw {
 		scope.Raw(sql)
 	} else {
-		scope.Raw(fmt.Sprintf("SELECT %v FROM %v %v", scope.selectSQL(), TABLE_NAME, sql))
+		scope.Raw(fmt.Sprintf("SELECT %v FROM %v %v", scope.selectSQL(), scope.Table, sql))
 	}
 	return &scope, nil
 }

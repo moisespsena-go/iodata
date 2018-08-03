@@ -5,6 +5,15 @@ import "io"
 type DataHeader struct {
 	Names []string
 	Types []DataType
+	ByName map[string]int
+}
+
+func NewDataHeader(names []string, types []DataType) *DataHeader {
+	dh := &DataHeader{names, types, map[string]int{}}
+	for i, name := range names {
+		dh.ByName[name] = i
+	}
+	return dh
 }
 
 type DataReader interface {
