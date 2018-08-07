@@ -14,7 +14,7 @@ type DataReader struct {
 	eof         bool
 }
 
-func (r *DataReader) Header() *api.DataHeader {
+func (r *DataReader) Header() api.DataHeader {
 	return r.DataHeader
 }
 

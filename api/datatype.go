@@ -11,11 +11,26 @@ func (dt DataTypeName) IsSlice() bool {
 	return dt[0:2] == "[]"
 }
 
+func (dt DataTypeName) Slice() DataTypeName {
+	return DataTypeName("[]" + dt)
+}
+
 func (dt DataTypeName) Elem() DataTypeName {
 	if dt.IsSlice() {
 		return dt[2:]
 	}
 	panic(fmt.Errorf("DataType %q isn't slice.", dt))
+}
+
+func (dt DataTypeName) Name() string {
+	for dt.IsSlice() {
+		dt = dt.Elem()
+	}
+	return string(dt)
+}
+
+func (dt DataTypeName) String() string {
+	return string(dt)
 }
 
 type DataType interface {
@@ -27,6 +42,7 @@ type DataType interface {
 	DefaultValue() interface{}
 	BlankValue() []byte
 	Type() reflect.Type
+	Slice() DataType
 }
 
 type DataTypeBase struct {

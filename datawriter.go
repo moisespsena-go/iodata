@@ -7,11 +7,11 @@ import (
 
 type DataWriter struct {
 	BytesWriter api.BytesWriter
-	DataHeader  *api.DataHeader
+	DataHeader  api.DataHeader
 	Count       int
 }
 
-func (r *DataWriter) Header() *api.DataHeader {
+func (r *DataWriter) Header() api.DataHeader {
 	return r.DataHeader
 }
 
