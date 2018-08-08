@@ -12,18 +12,18 @@ import (
 	"regexp"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/moisespsena-go/iodata/api"
 	"github.com/moisespsena/go-error-wrap"
 )
 
-type Field struct {
+type SearchField struct {
 	Index int
 	Value reflect.Value
 }
 
 type Scope struct {
-	Header          *api.DataHeader
+	Header          api.DataHeader
 	Search          *Search
 	Dialect         gorm.Dialect
 	Value           interface{}
@@ -32,8 +32,8 @@ type Scope struct {
 	instanceID      string
 	primaryKeyField int
 	skipLeft        bool
-	fields          *[]*Field
-	fieldsByName    map[string]*Field
+	fields          *[]*SearchField
+	fieldsByName    map[string]*SearchField
 	selectAttrs     *[]string
 	primaryValue    interface{}
 	primaryValueSet bool
@@ -204,7 +204,6 @@ func (scope *Scope) buildCondition(clause map[string]interface{}, include bool) 
 	replacements := []string{}
 	args := clause["args"].([]interface{})
 	for _, arg := range args {
-		var err error
 		switch reflect.ValueOf(arg).Kind() {
 		case reflect.Slice: // For where("id in (?)", []int64{1,2})
 			if scanner, ok := interface{}(arg).(driver.Valuer); ok {
@@ -244,7 +243,6 @@ func (scope *Scope) buildCondition(clause map[string]interface{}, include bool) 
 
 			replacements = append(replacements, scope.AddToVars(arg))
 		}
-		return "", err
 	}
 
 	buff := bytes.NewBuffer([]byte{})
@@ -366,11 +364,12 @@ func (scope *Scope) whereSQL() (sql string, err error) {
 
 func (scope *Scope) selectSQL() (sql string) {
 	if len(scope.Search.selects) == 0 {
-		if len(scope.Search.joinConditions) > 0 {
-			sql = fmt.Sprintf("%v.*", scope.Table)
-		} else {
-			sql = "*"
+		names := scope.Header.Names()
+		columns := make([]string, len(names))
+		for i, name := range names {
+			columns[i] = fmt.Sprintf("%v.%v", scope.Table, name)
 		}
+		sql = strings.Join(columns, ", ")
 	} else {
 		sql = scope.buildSelectQuery(scope.Search.selects)
 	}

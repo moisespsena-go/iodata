@@ -9,7 +9,7 @@ import (
 
 type DataReader struct {
 	BytesReader api.BytesReader
-	DataHeader  *api.DataHeader
+	DataHeader  api.DataHeader
 	Count       int
 	eof         bool
 }
@@ -44,7 +44,7 @@ func (r *DataReader) Read(result ...[]interface{}) (count int, notBlank [][]bool
 		return
 	}
 
-	typs := r.Header().Types
+	typs := r.Header().Types()
 	notBlank = make([][]bool, l)
 	for i := range byts {
 		notBlank[i], err = ScanSliceAssign(typs, byts[i], result[i])

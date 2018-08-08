@@ -20,12 +20,8 @@ type QueryFunc struct {
 	Args []string
 }
 
-type QueryContext struct {
-	Tables map[string]api.DataHeader
-}
-
 type Query struct {
-	Context *QueryContext
+	Context *api.DataSourceContext
 	Source  string
 	Args    []interface{}
 	// tables tables used on query

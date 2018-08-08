@@ -42,13 +42,30 @@ type DataType interface {
 	DefaultValue() interface{}
 	BlankValue() []byte
 	Type() reflect.Type
-	Slice() DataType
+	//Slice() DataType
 }
 
 type DataTypeBase struct {
 	TypeName DataTypeName
 	Default  interface{}
 	Typ      reflect.Type
+
+	prepareScanCallbacks []func(data []byte) []byte
+}
+
+func NewDataTypeBase(typeName DataTypeName, defaul interface{}) DataTypeBase {
+	return DataTypeBase{TypeName: typeName, Default: defaul, Typ: reflect.TypeOf(defaul)}
+}
+
+func (b *DataTypeBase) AddPrepareScan(f func(data []byte) []byte) {
+	b.prepareScanCallbacks = append(b.prepareScanCallbacks, f)
+}
+
+func (b *DataTypeBase) PrepareScan(data []byte) []byte {
+	for _, cb := range b.prepareScanCallbacks {
+		data = cb(data)
+	}
+	return data
 }
 
 func (b *DataTypeBase) Name() DataTypeName {

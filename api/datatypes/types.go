@@ -1,10 +1,8 @@
 package datatypes
 
 import (
-	"strconv"
-	"strings"
-
 	"fmt"
+	"strconv"
 
 	"reflect"
 
@@ -48,46 +46,55 @@ var (
 	Float64ReflectType = reflect.TypeOf((*float64)(nil)).Elem()
 	BoolReflectType    = reflect.TypeOf((*bool)(nil)).Elem()
 	TimeReflectType    = reflect.TypeOf((*time.Time)(nil)).Elem()
+	DefaultTypes       = map[DataTypeName]api.DataType{
+		STRING:   NewString(),
+		INT64:    NewInt64(),
+		FLOAT64:  NewFloat64(),
+		DATE:     NewDate(),
+		DATETIME: NewTimestamp(),
+		BOOL:     NewBool(),
+	}
 )
 
-type StringType struct {
+type String struct {
 	api.DataTypeBase
 }
 
-func (StringType) Scan(value []byte) (interface{}, error) {
+func (String) Scan(value []byte) (interface{}, error) {
 	return string(value), nil
 }
 
-func (StringType) Dump(value interface{}) ([]byte, error) {
-	return []byte(value.(string)), nil
+func (String) Dump(value interface{}) ([]byte, error) {
+	return []byte(*value.(*string)), nil
 }
 
-func (StringType) Elem() api.DataType {
+func (String) Elem() api.DataType {
 	return nil
 }
 
-func (StringType) Type() reflect.Type {
+func (String) Type() reflect.Type {
 	return StringReflectType
 }
 
-type Int64Type struct {
+type Int64 struct {
 	api.DataTypeBase
 }
 
-func (Int64Type) Scan(value []byte) (interface{}, error) {
+func (Int64) Scan(value []byte) (interface{}, error) {
 	v, err := strconv.Atoi(string(value))
 	return int64(v), err
 }
 
-func (Int64Type) Dump(value interface{}) ([]byte, error) {
-	return []byte(fmt.Sprint(value)), nil
+func (Int64) Dump(value interface{}) ([]byte, error) {
+	v := fmt.Sprint(*value.(*int64))
+	return []byte(v), nil
 }
 
-func (Int64Type) Elem() api.DataType {
+func (Int64) Elem() api.DataType {
 	return nil
 }
 
-func (Int64Type) Type() reflect.Type {
+func (Int64) Type() reflect.Type {
 	return Int64ReflectType
 }
 
@@ -114,40 +121,41 @@ func (f FloatRound) Fix(value float64) float64 {
 	return f.DefaultFix(value)
 }
 
-type Float64Type struct {
+type Float64 struct {
 	api.DataTypeBase
 	Format string
 	Round  *FloatRound
 }
 
-func (f Float64Type) Scan(value []byte) (interface{}, error) {
-	v, err := strconv.ParseFloat(strings.Replace(string(value), ",", ".", 1), 64)
+func (f Float64) Scan(value []byte) (interface{}, error) {
+	v, err := strconv.ParseFloat(string(value), 64)
 	if err == nil && f.Round != nil {
 		v = f.Round.Fix(v)
 	}
 	return v, err
 }
 
-func (f Float64Type) Dump(value interface{}) ([]byte, error) {
+func (f Float64) Dump(value interface{}) ([]byte, error) {
+	fvalue := *value.(*float64)
 	if f.Format == "" {
-		return []byte(fmt.Sprint(value)), nil
+		return []byte(fmt.Sprint(fvalue)), nil
 	}
-	return []byte(fmt.Sprintf(f.Format, value)), nil
+	return []byte(fmt.Sprintf(f.Format, fvalue)), nil
 }
 
-func (Float64Type) Elem() api.DataType {
+func (Float64) Elem() api.DataType {
 	return nil
 }
 
-func (Float64Type) Type() reflect.Type {
+func (Float64) Type() reflect.Type {
 	return Float64ReflectType
 }
 
-type BoolType struct {
+type Bool struct {
 	api.DataTypeBase
 }
 
-func (BoolType) Scan(value []byte) (interface{}, error) {
+func (Bool) Scan(value []byte) (interface{}, error) {
 	var (
 		v   bool
 		err error
@@ -166,23 +174,23 @@ func (BoolType) Scan(value []byte) (interface{}, error) {
 	return v, err
 }
 
-func (BoolType) Dump(value interface{}) ([]byte, error) {
+func (Bool) Dump(value interface{}) ([]byte, error) {
 	v := "false"
-	if value.(bool) {
+	if *value.(*bool) {
 		v = "true"
 	}
 	return []byte(v), nil
 }
 
-func (BoolType) Elem() api.DataType {
+func (Bool) Elem() api.DataType {
 	return nil
 }
 
-func (BoolType) Type() reflect.Type {
+func (Bool) Type() reflect.Type {
 	return BoolReflectType
 }
 
-type DateType struct {
+type Date struct {
 	api.DataTypeBase
 }
 
@@ -190,7 +198,7 @@ var (
 	dateRe, _ = regexp.Compile("(\\d{4})-(\\d{2})-(\\d{2})")
 )
 
-func (DateType) Scan(value []byte) (interface{}, error) {
+func (Date) Scan(value []byte) (interface{}, error) {
 	var (
 		v time.Time
 	)
@@ -206,20 +214,20 @@ func (DateType) Scan(value []byte) (interface{}, error) {
 	return v, nil
 }
 
-func (DateType) Dump(value interface{}) ([]byte, error) {
-	t := value.(time.Time)
+func (Date) Dump(value interface{}) ([]byte, error) {
+	t := value.(*time.Time)
 	return []byte(fmt.Sprintf("%d-%02d-%02d", t.Year(), t.Month(), t.Day())), nil
 }
 
-func (DateType) Elem() api.DataType {
+func (Date) Elem() api.DataType {
 	return nil
 }
 
-func (DateType) Type() reflect.Type {
+func (Date) Type() reflect.Type {
 	return TimeReflectType
 }
 
-type TimestampType struct {
+type Timestamp struct {
 	api.DataTypeBase
 }
 
@@ -227,7 +235,7 @@ var (
 	timestampRe, _ = regexp.Compile("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})")
 )
 
-func (TimestampType) Scan(value []byte) (interface{}, error) {
+func (Timestamp) Scan(value []byte) (interface{}, error) {
 	var (
 		v time.Time
 	)
@@ -246,15 +254,15 @@ func (TimestampType) Scan(value []byte) (interface{}, error) {
 	return v, nil
 }
 
-func (TimestampType) Dump(value interface{}) ([]byte, error) {
-	t := value.(time.Time)
+func (Timestamp) Dump(value interface{}) ([]byte, error) {
+	t := value.(*time.Time)
 	return []byte(fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())), nil
 }
 
-func (TimestampType) Elem() api.DataType {
+func (Timestamp) Elem() api.DataType {
 	return nil
 }
 
-func (TimestampType) Type() reflect.Type {
+func (Timestamp) Type() reflect.Type {
 	return TimeReflectType
 }

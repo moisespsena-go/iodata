@@ -1,22 +1,22 @@
 package api
 
 type DataReaderFactory interface {
-	Factory(header *DataHeader, args ...interface{}) DataReader
+	Factory(header DataHeader, args ...interface{}) DataReader
 }
 
 type DataWriterFactory interface {
-	Factory(header *DataHeader, args ...interface{}) DataWriter
+	Factory(header DataHeader, args ...interface{}) DataWriter
 }
 
-type DataReaderFactoryFunc func(header *DataHeader, args ...interface{}) DataReader
+type DataReaderFactoryFunc func(header DataHeader, args ...interface{}) DataReader
 
-func (f DataReaderFactoryFunc) Factory(header *DataHeader, args ...interface{}) DataReader {
+func (f DataReaderFactoryFunc) Factory(header DataHeader, args ...interface{}) DataReader {
 	return f(header, args...)
 }
 
-type DataWriterFactoryFunc func(header *DataHeader, args ...interface{}) DataWriter
+type DataWriterFactoryFunc func(header DataHeader, args ...interface{}) DataWriter
 
-func (f DataWriterFactoryFunc) Factory(header *DataHeader, args ...interface{}) DataWriter {
+func (f DataWriterFactoryFunc) Factory(header DataHeader, args ...interface{}) DataWriter {
 	return f(header, args...)
 }
 

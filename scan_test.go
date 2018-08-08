@@ -9,7 +9,7 @@ import (
 
 func TestScanAssign(t *testing.T) {
 	var (
-		dt       = &datatypes.Int64Type{}
+		dt       = &datatypes.Int64{}
 		value    int64
 		notBlank bool
 	)
@@ -44,7 +44,7 @@ func TestScanAssign(t *testing.T) {
 }
 
 func TestScan(t *testing.T) {
-	dt := &datatypes.Int64Type{}
+	dt := &datatypes.Int64{}
 	value, err := Scan(dt, []byte("2018"))
 	if err != nil {
 		t.Error(err)
@@ -77,7 +77,7 @@ func TestScanSliceAssign(t *testing.T) {
 		intValue   int64
 		floatValue float64
 	)
-	_, err := ScanSliceAssign([]api.DataType{&datatypes.Int64Type{}, &datatypes.Float64Type{}},
+	_, err := ScanSliceAssign([]api.DataType{&datatypes.Int64{}, &datatypes.Float64{}},
 		[][]byte{[]byte("2018"), []byte("12.8")}, []interface{}{&intValue, &floatValue})
 	if err != nil {
 		t.Error(err)
@@ -95,7 +95,7 @@ func TestScanSliceStringsAssign(t *testing.T) {
 		intValue   int64
 		floatValue float64
 	)
-	_, err := ScanSliceStringsAssign([]api.DataType{&datatypes.Int64Type{}, &datatypes.Float64Type{}},
+	_, err := ScanSliceStringsAssign([]api.DataType{&datatypes.Int64{}, &datatypes.Float64{}},
 		[]string{"2018", "12.8"}, []interface{}{&intValue, &floatValue})
 	if err != nil {
 		t.Error(err)

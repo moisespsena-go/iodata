@@ -3,10 +3,11 @@ package query
 import (
 	"os"
 	"testing"
+	"github.com/moisespsena-go/iodata/api"
 )
 
 func TestQuery_Parse(t *testing.T) {
-	ctx := &QueryContext{}
+	ctx := &api.DataSourceContext{}
 
 	var sql string
 	/*sql = `SELECT (1 + (self.nome * 3) + self.j + (case when self.R = 2 then 7 else 8 end)) as t FROM self t

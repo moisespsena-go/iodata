@@ -98,7 +98,7 @@ func (q *QueryString) gen(nods ...interface{}) {
 				}
 			case *nodes.IntoClause:
 				if s != nil {
-					panic(fmt.Errorf("Not Implemented %q", nt))
+					panic(fmt.Errorf("IntoClause Not Implemented %q", nt))
 				}
 			case nodes.FuncCall:
 				var names []string
@@ -126,7 +126,7 @@ func (q *QueryString) gen(nods ...interface{}) {
 					q.gen(s.Rexpr)
 					q.w(")")
 				default:
-					panic("Not Implemented error!")
+					panic("A_Expr.Kind Not Implemented error!")
 				}
 			case nodes.BoolExpr:
 				switch s.Boolop {
@@ -198,7 +198,7 @@ func (q *QueryString) gen(nods ...interface{}) {
 					q.w("ARRAY")
 				case nodes.EXPR_SUBLINK:
 				default:
-					panic(fmt.Errorf("Not Implemented %q", nt))
+					panic(fmt.Errorf("SubLinkType Not Implemented %q", nt))
 				}
 				q.w(" (\n")
 				q.tab(func() {
@@ -344,7 +344,7 @@ func (q *QueryString) gen(nods ...interface{}) {
 				case nodes.String:
 					q.w("'", strings.Replace(vt.Str, "'", "''", -1), "'")
 				default:
-					panic(fmt.Errorf("Not Implemented %q", nt))
+					panic(fmt.Errorf("A_Const Not Implemented %q", nt))
 				}
 			case nodes.String:
 				q.tw(s.Str)
@@ -380,6 +380,8 @@ func (q *QueryString) gen(nods ...interface{}) {
 					q.w(")::")
 					q.w(typName)
 				}
+			case nodes.ParamRef:
+				q.w("$",fmt.Sprint(s.Number))
 			default:
 				panic(fmt.Errorf("Not Implemented %q", nt))
 			}

@@ -305,9 +305,10 @@ func (q *Query) Parse() (err error) {
 
 func (q *Query) Validate() error {
 	for name, qt := range q.tables {
-		if ct, ok := q.Context.Tables[name]; ok {
+		if ct, ok := q.Context.DataSources[name]; ok {
+			h := ct.Header()
 			for cname := range qt.Fields {
-				if !ct.HasField(cname) {
+				if !h.HasField(cname) {
 					return errwrap.Wrap(ErrColumnNotFound, "Column %q.%q", name, cname)
 				}
 			}

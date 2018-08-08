@@ -32,7 +32,7 @@ func (r *Reader) Read(result [][][]byte) (count int, err error) {
 }
 
 func NewReaderFactory() api.DataReaderFactory {
-	return api.DataReaderFactoryFunc(func(header *api.DataHeader, args ...interface{}) api.DataReader {
+	return api.DataReaderFactoryFunc(func(header api.DataHeader, args ...interface{}) api.DataReader {
 		csvReader := csv.NewReader(args[0].(io.Reader))
 		csvReader.Comma = ';'
 		return &iodata.DataReader{BytesReader: &Reader{csvReader}, DataHeader: header}
@@ -40,7 +40,7 @@ func NewReaderFactory() api.DataReaderFactory {
 }
 
 func NewWriterFactory() api.DataWriterFactory {
-	return api.DataWriterFactoryFunc(func(header *api.DataHeader, args ...interface{}) api.DataWriter {
+	return api.DataWriterFactoryFunc(func(header api.DataHeader, args ...interface{}) api.DataWriter {
 		csvWriter := csv.NewWriter(args[0].(io.Writer))
 		csvWriter.Comma = ';'
 		return &iodata.DataWriter{BytesWriter: &Writer{Writer: csvWriter}, DataHeader: header}

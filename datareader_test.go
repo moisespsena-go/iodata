@@ -12,7 +12,7 @@ import (
 func TestDataReader_Read(t *testing.T) {
 	var (
 		br       = &StringsBytesReader{Reader: NewSliceStringsReader([]string{"15", "1.2"}, []string{"7", "5.0896"})}
-		types    = []api.DataType{&datatypes.Int64Type{}, &datatypes.Float64Type{}}
+		types    = []api.DataType{&datatypes.Int64{}, &datatypes.Float64{}}
 		r        = &DataReader{BytesReader: br, DataHeader: &api.DataHeader{Types: types}}
 		a0, a1   int64
 		b0, b1   float64
@@ -69,7 +69,7 @@ func TestDataReader_Read(t *testing.T) {
 func TestDataReader_Read2(t *testing.T) {
 	var (
 		br    = &StringsBytesReader{Reader: NewSliceStringsReader([]string{"15", "1.2"}, []string{"7", "5.0896"})}
-		types = []api.DataType{&datatypes.Int64Type{}, &datatypes.Float64Type{}}
+		types = []api.DataType{&datatypes.Int64{}, &datatypes.Float64{}}
 		r     = &DataReader{BytesReader: br, DataHeader: &api.DataHeader{Types: types}}
 		a0    int64
 		b0    float64

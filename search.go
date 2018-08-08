@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/moisespsena-go/iodata/api"
 	"github.com/moisespsena/go-error-wrap"
 )
 
@@ -40,32 +41,32 @@ type Search struct {
 	ignoreOrderQuery bool
 }
 
-func (s *Search) Select(query interface{}, args ...interface{}) *Search {
+func (s *Search) Select(query interface{}, args ...interface{}) api.Searcher {
 	s.selects = map[string]interface{}{"query": query, "args": args}
 	return s
 }
 
-func (s *Search) Where(query interface{}, values ...interface{}) *Search {
+func (s *Search) Where(query interface{}, values ...interface{}) api.Searcher {
 	s.whereConditions = append(s.whereConditions, map[string]interface{}{"query": query, "args": values})
 	return s
 }
 
-func (s *Search) Not(query interface{}, values ...interface{}) *Search {
+func (s *Search) Not(query interface{}, values ...interface{}) api.Searcher {
 	s.notConditions = append(s.notConditions, map[string]interface{}{"query": query, "args": values})
 	return s
 }
 
-func (s *Search) Or(query interface{}, values ...interface{}) *Search {
+func (s *Search) Or(query interface{}, values ...interface{}) api.Searcher {
 	s.orConditions = append(s.orConditions, map[string]interface{}{"query": query, "args": values})
 	return s
 }
 
-func (s *Search) Limit(limit interface{}) *Search {
+func (s *Search) Limit(limit interface{}) api.Searcher {
 	s.limit = limit
 	return s
 }
 
-func (s *Search) Offset(offset interface{}) *Search {
+func (s *Search) Offset(offset interface{}) api.Searcher {
 	s.offset = offset
 	return s
 }
@@ -89,7 +90,7 @@ func (s *Search) getInterfaceAsSQL(value interface{}) (str string, err error) {
 	return
 }
 
-func (s *Search) Having(query interface{}, values ...interface{}) *Search {
+func (s *Search) Having(query interface{}, values ...interface{}) api.Searcher {
 	if val, ok := query.(*expr); ok {
 		s.havingConditions = append(s.havingConditions, map[string]interface{}{"query": val.expr, "args": val.args})
 	} else {
@@ -98,7 +99,7 @@ func (s *Search) Having(query interface{}, values ...interface{}) *Search {
 	return s
 }
 
-func (s *Search) Joins(query string, values ...interface{}) *Search {
+func (s *Search) Joins(query string, values ...interface{}) api.Searcher {
 	s.joinConditions = append(s.joinConditions, map[string]interface{}{"query": query, "args": values})
 	return s
 }

@@ -7,21 +7,6 @@ import (
 	"github.com/moisespsena-go/iodata/api"
 )
 
-type DataSource struct {
-	iodata.DataSource
-	ReaderFactory api.DataReaderFactory
-	FilePath      string
-}
-
-func (i *DataSource) Load() (api.DataReadCloser, error) {
-	r, err := os.Open(i.FilePath)
-	if err != nil {
-		return nil, err
-	}
-	dr := i.ReaderFactory.Factory(i.DataHeader, r, i.Filters)
-	return &iodata.DataReadCloser{dr, r.Close}, nil
-}
-
 type Output struct {
 	iodata.Output
 	WriterFactory api.DataWriterFactory
