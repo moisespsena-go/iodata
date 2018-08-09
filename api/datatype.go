@@ -38,6 +38,8 @@ type DataType interface {
 	IsSlice() bool
 	Scan(value []byte) (interface{}, error)
 	Dump(value interface{}) ([]byte, error)
+	// DumpP dump the ptr value
+	DumpP(value interface{}) ([]byte, error)
 	Elem() DataType
 	DefaultValue() interface{}
 	BlankValue() []byte

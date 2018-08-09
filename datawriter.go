@@ -23,6 +23,14 @@ func (w *DataWriter) Write(data ...[]interface{}) (err error) {
 	return w.BytesWriter.Write(byts)
 }
 
+func (w *DataWriter) WriteP(data ...[]interface{}) (err error) {
+	byts, err := DumpP(w.Header(), data)
+	if err != nil {
+		return errwrap.Wrap(err, "DumpP")
+	}
+	return w.BytesWriter.Write(byts)
+}
+
 func (w *DataWriter) WriteOne(data ...interface{}) (err error) {
 	return w.Write(data)
 }

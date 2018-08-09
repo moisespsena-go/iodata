@@ -3,7 +3,10 @@ package iodata
 import (
 	"io"
 
+	"reflect"
+
 	"github.com/moisespsena-go/iodata/api"
+	"github.com/moisespsena-go/iodata/modelstruct"
 	"github.com/moisespsena/go-error-wrap"
 )
 
@@ -73,4 +76,38 @@ type DataReadCloser struct {
 
 func (r *DataReadCloser) Close() error {
 	return r.CloseFunc()
+}
+
+func ReadStruct(reader func(model *modelstruct.ModelStruct, results ...interface{}) (count int, err error), results ...interface{}) (count int, err error) {
+	if len(results) == 0 {
+		return
+	}
+
+	rt := reflect.TypeOf(results[0])
+	for rt.Kind() == reflect.Ptr {
+		rt = rt.Elem()
+	}
+	switch rt.Kind() {
+	case reflect.Slice:
+		// get type of ptr value at slice[0]: []*User{&u} or make([]*User, n)
+		model := modelstruct.Get(rt.Elem().Elem())
+		var (
+			rv              = reflect.ValueOf(results[0])
+			resultsInteface = make([]interface{}, rv.Len())
+			elem            reflect.Value
+		)
+
+		for i := range resultsInteface {
+			if elem = rv.Index(i); elem.IsNil() {
+				elem.Set(reflect.New(model.Type))
+			}
+			resultsInteface[i] = elem.Interface()
+		}
+
+		return reader(model, resultsInteface...)
+	case reflect.Struct:
+		model := modelstruct.Get(rt)
+		return reader(model, results...)
+	}
+	return
 }

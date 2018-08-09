@@ -1,6 +1,8 @@
 package api
 
-import "io"
+import (
+	"io"
+)
 
 type DataField interface {
 	Name() string
@@ -100,6 +102,20 @@ type DataReader interface {
 	Header() DataHeader
 	Read(result ...[]interface{}) (count int, notBlank [][]bool, err error)
 	ReadOne(result ...interface{}) (notBlank []bool, err error)
+
+	// ReadStruct read into one or more structs
+	// Examples:
+	// var user User
+	// r.ReadStruct(&user)
+	// or
+	// var user1, user2 User
+	// r.ReadStruct(&user1, &user2)
+	// or
+	// r.ReadStruct([]*User{&u})
+	// or
+	// users := make([]*User, 5)
+	// r.ReadStruct(users)
+	ReadStruct(results ...interface{}) (count int, err error)
 }
 
 type DataReadCloser interface {
@@ -110,6 +126,8 @@ type DataReadCloser interface {
 type DataWriter interface {
 	Header() DataHeader
 	Write(data ...[]interface{}) (err error)
+	// WriteP wirite ptr values
+	WriteP(data ...[]interface{}) (err error)
 	WriteOne(data ...interface{}) (err error)
 }
 

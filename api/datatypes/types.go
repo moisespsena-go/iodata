@@ -65,7 +65,11 @@ func (String) Scan(value []byte) (interface{}, error) {
 }
 
 func (String) Dump(value interface{}) ([]byte, error) {
-	return []byte(*value.(*string)), nil
+	return []byte(value.(string)), nil
+}
+
+func (t String) DumpP(value interface{}) ([]byte, error) {
+	return t.Dump(*value.(*string))
 }
 
 func (String) Elem() api.DataType {
@@ -86,8 +90,11 @@ func (Int64) Scan(value []byte) (interface{}, error) {
 }
 
 func (Int64) Dump(value interface{}) ([]byte, error) {
-	v := fmt.Sprint(*value.(*int64))
-	return []byte(v), nil
+	return []byte(fmt.Sprint(value.(int64))), nil
+}
+
+func (t Int64) DumpP(value interface{}) ([]byte, error) {
+	return t.Dump(*value.(*int64))
 }
 
 func (Int64) Elem() api.DataType {
@@ -136,11 +143,15 @@ func (f Float64) Scan(value []byte) (interface{}, error) {
 }
 
 func (f Float64) Dump(value interface{}) ([]byte, error) {
-	fvalue := *value.(*float64)
+	fvalue := value.(float64)
 	if f.Format == "" {
 		return []byte(fmt.Sprint(fvalue)), nil
 	}
 	return []byte(fmt.Sprintf(f.Format, fvalue)), nil
+}
+
+func (t Float64) DumpP(value interface{}) ([]byte, error) {
+	return t.Dump(*value.(*float64))
 }
 
 func (Float64) Elem() api.DataType {
@@ -176,10 +187,14 @@ func (Bool) Scan(value []byte) (interface{}, error) {
 
 func (Bool) Dump(value interface{}) ([]byte, error) {
 	v := "false"
-	if *value.(*bool) {
+	if value.(bool) {
 		v = "true"
 	}
 	return []byte(v), nil
+}
+
+func (t Bool) DumpP(value interface{}) ([]byte, error) {
+	return t.Dump(*value.(*bool))
 }
 
 func (Bool) Elem() api.DataType {
@@ -215,8 +230,12 @@ func (Date) Scan(value []byte) (interface{}, error) {
 }
 
 func (Date) Dump(value interface{}) ([]byte, error) {
-	t := value.(*time.Time)
+	t := value.(time.Time)
 	return []byte(fmt.Sprintf("%d-%02d-%02d", t.Year(), t.Month(), t.Day())), nil
+}
+
+func (t Date) DumpP(value interface{}) ([]byte, error) {
+	return t.Dump(*value.(*time.Time))
 }
 
 func (Date) Elem() api.DataType {
@@ -255,8 +274,12 @@ func (Timestamp) Scan(value []byte) (interface{}, error) {
 }
 
 func (Timestamp) Dump(value interface{}) ([]byte, error) {
-	t := value.(*time.Time)
+	t := value.(time.Time)
 	return []byte(fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())), nil
+}
+
+func (t Timestamp) DumpP(value interface{}) ([]byte, error) {
+	return t.Dump(*value.(*time.Time))
 }
 
 func (Timestamp) Elem() api.DataType {

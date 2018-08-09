@@ -49,3 +49,10 @@ func (rs *RawScaner) SetToSlice(dest []interface{}, i int) *RawScaner {
 	}
 	return rs
 }
+
+// RawScanerDiscard discard value
+type RawScanerDiscard struct{}
+
+func (RawScanerDiscard) Scan(src interface{}) error {
+	return nil
+}
