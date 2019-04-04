@@ -2,7 +2,7 @@ package iodata
 
 import (
 	"github.com/moisespsena-go/iodata/api"
-	"github.com/moisespsena/go-error-wrap"
+	"github.com/moisespsena-go/error-wrap"
 )
 
 type DataWriter struct {

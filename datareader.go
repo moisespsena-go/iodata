@@ -7,7 +7,7 @@ import (
 
 	"github.com/moisespsena-go/iodata/api"
 	"github.com/moisespsena-go/iodata/modelstruct"
-	"github.com/moisespsena/go-error-wrap"
+	"github.com/moisespsena-go/error-wrap"
 )
 
 type DataReader struct {

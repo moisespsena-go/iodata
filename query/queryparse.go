@@ -11,7 +11,7 @@ import (
 
 	"github.com/lfittl/pg_query_go"
 	nodes "github.com/lfittl/pg_query_go/nodes"
-	"github.com/moisespsena/go-error-wrap"
+	"github.com/moisespsena-go/error-wrap"
 )
 
 var (

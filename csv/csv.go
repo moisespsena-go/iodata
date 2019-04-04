@@ -6,7 +6,7 @@ import (
 
 	"github.com/moisespsena-go/iodata"
 	"github.com/moisespsena-go/iodata/api"
-	"github.com/moisespsena/go-error-wrap"
+	"github.com/moisespsena-go/error-wrap"
 )
 
 type Reader struct {

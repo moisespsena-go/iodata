@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/moisespsena-go/iodata/api"
-	"github.com/moisespsena/go-error-wrap"
+	"github.com/moisespsena-go/error-wrap"
 )
 
 func ScanAssign(dataType api.DataType, data []byte, dest interface{}) (notBlank bool, err error) {
